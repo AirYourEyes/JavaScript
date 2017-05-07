@@ -281,3 +281,132 @@ console.log(a);
 ```
 打印的结果是`12`
 
+### 10. 语句
+#### 10.1 分支语句
+
+- if语句
+    - 格式： `if(条件判断){语句块}`
+        - 执行步骤：当条件为真的时候执行语句块中的内容，否则不执行
+- if-else语句
+    - 格式： 
+    ``` javascript
+     	if(条件判断){
+      		语句块1；
+        } else{
+			语句块2；
+		}
+	```
+
+	- 解释：当条件判断成立时，执行语句块1，否则执行语句块2
+- if-else-...-if-else语句
+	- 格式：
+	``` 
+		if (条件判断1){
+			语句1；
+		} else if(条件判断2){
+			语句2；
+		}
+		.
+		.
+		.
+		else if(条件n){
+			语句n；
+		}
+		else{
+			语句n + 1;
+		}
+			
+	   ```
+	
+	- 解释： 从上到下进行判断，若条件1成立，则执行语句块1，否则判断条件2，若条件2成立，执行语句块2，否则判断条件3，依此类推，但是最后一个语句必须是else语句
+
+#### 10.2 循环语句
+- while语句
+    - 格式：
+    ```
+		while(循坏条件){
+			语句块;
+		}
+	```
+    - 解释：先进行判断，当循环条件成立的时候，执行循坏体中的语句块，否则退出循坏
+
+- do-while语句
+    - 格式：
+	```
+		do{
+			语句块;
+		} while(循环条件);
+	```
+	- 解释：先执行语句块，后执行判断。当条件成立的时候继续执行循坏体中的语句，否则退出循环
+
+- for语句
+    - 格式：
+    ```
+		for(语句1；语句2；语句3){
+			语句4；
+		}
+    ```
+    - 解释：语句1为初始化条件，语句2为条件判断语句，语句3为变量更新语句。最初执行语句1，然后进行条件的判断（即执行语句块2），若成立，执行语句4，然后再执行更新操作（即语句3），之后再进行条件判断，若条件成立，继续执行语句4，然后执行语句3，否则退出循环，整个循环的过程中，初始化语句（即语句1）只被执行过一次
+
+### 11. 对象
+- 简述：
+    - 使用typeof打印出的值为object
+    - 对象的属性名和属性值成对存在
+- 分类：
+    - 内建对象：
+        - 有ES标准中定义的对象，在任何的ES实现中都可以使用
+        - 比如：Math，String，Number，Boolean，Function，Object等
+    - 宿主对象：
+        - 由js的运行环境提供的对象，目前来讲主要指的是浏览器提供的对象
+        - 比如BOM，DOM
+    - 自定义对象：
+        - 由开发人员自己创建的对象
+- 创建对象（使用new关键字）
+    - 格式:`var objectName = new Object();`
+    - 比如`var person = new Object();`
+- 给对象添加属性
+    - 使用`.`添加添加属性和属性值
+        - 格式：`objectName.attribute = value;`
+        - 比如： `person.age = 12;`
+        - 访问的方式：`objectName.attribute;`
+        - 比如：`console.log(person.age);`
+    - 使用`[]`添加属性和属性值
+        - 格式：`objectName['attribute'] = value;`
+        - 比如：`person['sex'] = 12;`
+        - 访问的方式：`objectName[attribute];`
+        - 比如：`console.log(person['sex']);`
+        - 要注意的是`[]`中的属性名的类型必须是字符串，也就是要由引号包含起来
+- 删除对象的属性
+    - 使用delete关键字：`delete objectName.attribute;`或`delete objectName['attribute'];`
+    - 比如：`delete person.age;`或者`delete person[name];`
+    - 若访问已经被删除的对象的属性，打印的结果是：`undefined`
+- 注意：
+    - js中对于对象的属性名没有严格的要求，我们可以使用关键字和保留字作为属性名（但不推荐使用这种方法），如`person.var = 112;`是被允许的。要是属性名中含有特殊的字符，我们必须用`[]`方法来创建对象的属性和属性值，如`person['@@@@@'] = 123;`
+    - 使用`[]`方法创建对象要比用`.`创建对象更加灵活，我们可以通过变量来去不同属性的值，如:
+    ``` javascript
+			var person = new Object();
+			person.name = "Clarence"; 
+			person.age = 13;
+			person.sex = "male";
+			var n = "name";
+			console.log(person[n]);
+			n = "age";
+			console.log(person[n]);
+			n = "sex";
+			console.log(person[n]);
+	```
+    输出的结果是：
+	```
+		Clarence
+        13
+        male
+    ```
+	在整个过程中，我们使用了变量n来控制我们要取的属性的属性值
+- 关于属性值
+    - 属性值可以是任意数据类型，可以是基本数据类型，也可以是对象类型
+- 检查对象是否包含一特定的属性
+    - 使用in关键字
+    - 格式： `'attributeName' in objectName；`
+    - 解释： 若对象中包含属性名为attributeName的属性，则返回true，否则返回false
+    - 要注意的是attributeName要使用引号包围起来，否则执行时报错
+    
