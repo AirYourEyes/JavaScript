@@ -361,9 +361,25 @@ console.log(a);
         - 比如BOM，DOM
     - 自定义对象：
         - 由开发人员自己创建的对象
-- 创建对象（使用new关键字）
-    - 格式:`var objectName = new Object();`
-    - 比如`var person = new Object();`
+- 创建对象
+    - 使用new关键字
+        - 格式:`var objectName = new Object();`
+        - 比如`var person = new Object();`
+    - 使用字面量（也就是使用大括号）
+        - 格式： `var obj = {att1:value1, att2:value2, ...}`其中value值还可以是对象
+        - 比如:   
+        ``` JavaScript
+        var obj = {
+				name:'clarence', 
+				age:11, 
+				sex:'man', 
+				address:{
+					province:'gz', 
+					street:'backstreet'
+				}, 
+				phone:"123456789"
+			};
+        ```    
 - 给对象添加属性
     - 使用`.`添加添加属性和属性值
         - 格式：`objectName.attribute = value;`
@@ -409,4 +425,23 @@ console.log(a);
     - 格式： `'attributeName' in objectName；`
     - 解释： 若对象中包含属性名为attributeName的属性，则返回true，否则返回false
     - 要注意的是attributeName要使用引号包围起来，否则执行时报错
+- 基本数据类型与引用类型之间的区别：
+    - 基本数据类型保存在栈当中，如下所示：   
+    ![basic_type1](images/basic_type1.png)    
+    要注意的是将a赋值给b是将a的值复制给b，a与b相互独立，此时若我们再执行b++，a将不受影响，此时内存情况如下所示：    
+    ![basic_type2](images/basic_type2.png)  
+    - 引用类型的保存涉及到堆与栈两个区域，如下所示：    
+    ![refer_type1](images/refer_type1.png)  
+    可以发现的是，在栈中引用变量的值其实保存的是对象在堆中的地址，将引用变量a赋值给b，相当于把地址赋值给了b，所以a与b指向了相同的对象，此时如果我们执行`b.name = "bob";`会发现a对象的name属性的值也变成了bob，此时内存中的情况如下所示：  
+    ![refer_type2](images/refer_type2.png)  
+    若此时我们执行`b = null;`a是否还指向原先的对象呢？答案是肯定的，执行`b = null;`使得其变量值变为null，并不影响a指向原先的对象，执行`b = null;`后内存的情况如下：  
+    ![refer_type3](images/refer_type3.png)   
+    - 不管是基本数据类型还是引用类型，两个相同类型变量的比较，其实是它们在栈中变量值的比较，若变量值相等则相等，否则不相等。如对于基本数据类型的比较：`var a = 12; var b = 12;`，很明显在栈中变量的值是相等的，所以a = b；对于引用数据类型的比较：  
+    ```
+		var = new Object(); 
+		a.name = "clarence"; 
+		var b =  new Object(); 
+		b.name="clarence;"
+	```  
+    尽管a与b在堆中的内容是相同的，但是在栈中，两个变量的变量值（对象的地址）是不相同的，所以两者也是不相等的               
     
