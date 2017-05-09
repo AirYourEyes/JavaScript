@@ -436,12 +436,63 @@ console.log(a);
     ![refer_type2](images/refer_type2.png)  
     若此时我们执行`b = null;`a是否还指向原先的对象呢？答案是肯定的，执行`b = null;`使得其变量值变为null，并不影响a指向原先的对象，执行`b = null;`后内存的情况如下：  
     ![refer_type3](images/refer_type3.png)   
-    - 不管是基本数据类型还是引用类型，两个相同类型变量的比较，其实是它们在栈中变量值的比较，若变量值相等则相等，否则不相等。如对于基本数据类型的比较：`var a = 12; var b = 12;`，很明显在栈中变量的值是相等的，所以a = b；对于引用数据类型的比较：  
+    - 不管是基本数据类型还是引用类型，两个相同类型变量的比较（使用==），其实是它们在栈中变量值的比较，若变量值相等则相等，否则不相等。如对于基本数据类型的比较：`var a = 12; var b = 12;`，很明显在栈中变量的值是相等的，所以a = b；对于引用数据类型的比较：  
     ```
 		var = new Object(); 
 		a.name = "clarence"; 
 		var b =  new Object(); 
 		b.name="clarence;"
 	```  
-    尽管a与b在堆中的内容是相同的，但是在栈中，两个变量的变量值（对象的地址）是不相同的，所以两者也是不相等的               
-    
+    尽管a与b在堆中的内容是相同的，但是在栈中，两个变量的变量值（对象的地址）是不相同的，所以两者也是不相等的      
+
+### 12. 函数
+- 简述：
+    - 函数也是一个对象
+    - 函数中可以封装执行语句
+    - 使用typeof的输出结果是function
+- 函数的定义：
+    - 第一种方法（了解即可）：通过构造函数
+        - 如：      
+        ``` 
+			var fun1 = new Function("console.log('I am function 1');");
+			fun1();
+		```    
+        - 上述代码的执行结果是：`I am function 1`
+        - 要注意的是，被封装到函数中的代码必须包含在引号中，如上代码所示，语句`console.log('I am function 1');`被包含在了双引号之内
+        - 第二个语句表示执行函数，下面会详细介绍
+	- 第二种方法：
+	    - 格式：     
+	    ```javascript
+			function functionName([param1, param2, ...]){
+				statements;
+			} 
+		```    
+		- 如：      
+		```javascript
+			function fun2(){
+				console.log("hello world");
+			}
+			fun2();
+		```      
+		- 代码的执行结果是：`hello world`
+		- 要注意的是函数的参数列表可以为空，如上面的示例就是一个无参的函数              
+	- 第三种方法：将匿名函数赋值给变量，此时变量名相当于函数名，可以通过变量名来引用函数
+	    - 格式：     
+	    ```javascript 
+			var functionName = function([param1, param2, ...]){
+				statements;
+			}
+		```      
+		- 等号右边定义了一个匿名函数，函数可以没有任何参数
+		- 如：    
+		```javascript
+			var fun3 = function(){
+				console.log("I am function 3");
+			}
+			fun3();
+		```    
+		- 函数的执行结果是： `I am function 3`
+- 函数的执行：
+    - 格式：`functionName(param1, param2, ...);`
+    - functionName表示的是函数名，小括号中的参数为实参，表示传给函数的实际值
+	- 如：调用函数fun1，代码如下，` fun1();`
