@@ -220,6 +220,7 @@ js中共有六种数据类型，其中前五种是基本数据类型，最后一
     - 任何类型的数据与NaN进行进行加法运算，其结果均为NaN
     - 若操作数均为string类型，那么相加表示的是字符串的连接，例如`a = '123' + '456';`结果是`'123456'`
     - 若一操作数为string类型，而另外一个操作数不为string类型，那么，会首先将非string类型的操作数转化成string类型的操作数，然后再进行连接操作，如`var a = true + "123";`结果为`true123`
+    - 若操作数中有undefined参与运算，则计算结果为NaN
 - 减号（-）
 - 乘法（*）
 - 除法（/）
@@ -460,7 +461,7 @@ console.log(a);
         - 上述代码的执行结果是：`I am function 1`
         - 要注意的是，被封装到函数中的代码必须包含在引号中，如上代码所示，语句`console.log('I am function 1');`被包含在了双引号之内
         - 第二个语句表示执行函数，下面会详细介绍
-	- 第二种方法：
+	- 第二种方法：通过函数声明
 	    - 格式：     
 	    ```javascript
 			function functionName([param1, param2, ...]){
@@ -476,7 +477,7 @@ console.log(a);
 		```      
 		- 代码的执行结果是：`hello world`
 		- 要注意的是函数的参数列表可以为空，如上面的示例就是一个无参的函数              
-	- 第三种方法：将匿名函数赋值给变量，此时变量名相当于函数名，可以通过变量名来引用函数
+	- 第三种方法：通过函数表达式，即将匿名函数赋值给变量，此时变量名相当于函数名，可以通过变量名来引用函数
 	    - 格式：     
 	    ```javascript 
 			var functionName = function([param1, param2, ...]){
@@ -496,3 +497,191 @@ console.log(a);
     - 格式：`functionName(param1, param2, ...);`
     - functionName表示的是函数名，小括号中的参数为实参，表示传给函数的实际值
 	- 如：调用函数fun1，代码如下，` fun1();`
+- 参数
+    - 定义函数的时候，函数中可以带参数，这些参数也就做形参，如：  
+    ```javascript 
+		function add(a, b, c){
+			cosole.log(a + b + c);
+		}
+	```  
+    - 上面的代码中，a, b, c都是函数的参数，注意声明参数的时候不用加上var关键字，如a，b，c前面都不用写var关键字
+    - 我们调用带参数的函数的时候需要具体指定形参的值，传进去的值叫做实参
+        - 若实参的数目少于形参的数目时，实参将从左到右依次赋值给形参，没有被赋值的实参的值为undefined  
+        ```javascript 
+			function show(a, b, c){
+				console.log(a);
+				console.log(b);
+				console.log(c);
+			}
+			show(1, 3);
+		```  
+        上面代码的结果是`1 3 undefined`
+		- 若实参数目与形参数目相同，这是正常调用的情况
+		- 若实参数目多于形参的数目，那么多余的实参会被丢弃  
+		``` javascript
+			function show(a, b, c){
+				console.log(a);
+				console.log(b);
+				console.log(c);
+			}
+			show(1, 2, 3, 4);			
+		```  
+		实参4不会赋值给任何的形参  
+	- 调用函数的时候，函数并不会检查实参的类型的
+	- 参数可以是任意类型（包括对象，函数）  
+	```
+		function fun(f, a, b){
+			return f(a, b);
+		}
+			
+		function add(a, b){
+			return a + b;
+		}
+			
+		var res = fun(add, 12, 13);
+		console.log(res);
+	```  
+    上面打印的结果是：`25`，上面的代码我们将add函数作为参数传给了fun函数，在fun函数中调用add函数返回结果，这里要注意的是传给fun函数的实参值是函数名（在这里是add）而不是函数名加括号（如add(1, 2)），将add(1, 2)做为实参实际上是将add函数的返回值作为实参
+- 返回值
+	- 在函数体中（大括号内），可以使用return关键字将函数处理的结果返回给调用者  
+	```javascript
+    	function add(a, b){
+			return a + b;
+		}
+		var sum = add(12, 33);	
+		console.log(sum);
+
+	```  
+    函数的打印结果是：`45`
+	- 执行return语句后将退出整个函数
+- 对象的属性的属性值也可以是函数，但我们一般不称其为函数，而是称之为对象的方法。如下代码所示：  
+```javascript
+	var person = new Object();
+	person.id = 1;
+	person.name = "clarence";
+	person.getId = function(){
+		return this.id;
+	}
+	person.getName = function(){
+		return this.name;
+	}
+	console.log(person.getId());
+	console.log(person.getName());
+```
+- 立即函数
+	- 函数会立即执行
+    - 立即函数只执行一次，之后无法再次调用
+    - 格式：  
+    ```javascript
+		(匿名函数声明)(参数列表);
+	```  
+	如：    
+    ```javascript
+		(function(){
+			alert("hello world");
+		})();
+	```  
+	千万要注意的是：匿名函数的声明必须在小括号中，否则执行会提示错误
+
+### 13.函数的作用域
+- 全局作用域
+    - **直接**在script标签编写的代码都在全局作用域中，在全局作用域中的变量叫做全局变量
+    - 全局作用域随页面的创建而创建，随页面的关闭而消失
+    - 全局变量在整个js程序中均可以使用，若在声明之前使用，变量的值将是undefined，如`console.log(a); var = 12;`打印出的结果是：`undefined`，这是变量的提前声明所导致的，我们很快就会详细介绍
+    - 在全局作用域中，有一个全局对象window  
+        - 它代表的是整个浏览器窗口
+        - 该对象由浏览器创建，可以直接使用
+        - 在全局作用域中创建的变量都作为window的一个属性
+        - 在全局作用域中创建的函数都作为window对象的方法
+        - 以下代码是等价的  
+	    代码一：  
+	    ```javascript
+			var a = 12;
+			console.log(a);
+		```
+		代码二： 
+		```javascript
+			var a = 12;
+			console.log(window.a);
+		```	
+- 函数作用域
+    - 在函数中使用var声明的变量，只能在函数中被访问，不可以在函数外使用，但是函数可以访问外部声明的变量，如以下代码：      
+    ```javacript
+		var a = 12;
+		function fun(){
+			console.log(a);	 //正确
+			var b = 13;
+		}
+		fun();
+		console.log(b);		//错误：提示引用错误
+	```
+	- 若在函数中定义的变量不使用var关键字进行声明的话，该变量将作为全局变量，而不是函数内的局部变量，如以下代码：  
+	```javascript
+		function fun(){
+			c = 12;
+		}
+		fun();
+		console.log(c);
+	```  
+	执行上面的代码，我们发现我们在函数外可以访问到了函数中声明的变量，这是因为变量c没有以var关键字进行声明，所以c变量其实是全局变量，故我们在函数外可以访问得到该变量 
+	接下来我们看以下的代码  
+	```javascript
+		function fun(){
+			var c = 12;
+		}
+		fun();
+		console.log(c);
+	```  
+	在这段代码中，函数中的变量c使用var关键字进行声明，此时执行console.log(c)，控制台提示引用错误。这是因为此时c是函数内的局部变量，所以外部无法直接访问该变量
+
+- 声明提前
+	- 不管是在全局作用域中还是在函数作用域中，都有声明提前的现象
+    - 变量声明提前：
+        - 在全局作用域（函数作用域）中使用var关键字声明的变量都会先于全局作用域（函数作用域）其他代码执行，此时变量的值为undefined，如以下的代码：    
+    	```javascript
+			console.log(a);
+			var a = 12;
+		```    
+		等价于：  
+		```javascript
+			var a;
+			console.log(a);
+			a = 12;
+		```  
+		所以程序的执行结果为`undefined`
+		- 若不使用var关键字声明变量的话，该变量是不会被提前的，如下面的代码将提示引用错误    
+		```javascript
+			console.log(a);
+			a = 12;
+		```    
+    - 函数声明提前：
+        - 我们之前已经学习过创建函数的三种方式了，若我们使用声明函数的方式，也就是使用以下的方法创建函数  
+        ```javascript
+			function funName([paramList]){
+				statements;
+			} 
+		```
+		那么可能会有函数声明提前现象的发生，如以下的代码：  
+		```javascript
+			fun();
+			function fun(){
+				console.log("Hello world");
+			}
+		```  
+		会发现，函数的调用在函数的声明之前了，但是代码仍正常执行，上面的代码等价于  
+		```javascrpt
+			function fun(){
+				console.log("Hello world");
+			}
+			fun();
+		```
+		- 如果我们使用函数表达式的方法创建函数，此时执行下面的代码将是错误的  
+		```javascript
+			console.log(fun);
+			fun();
+			var fun = function(){
+				console.log("Hello world");
+			};
+
+		```  
+		执行`console.log(fun);`时，由于变量声明提前，所以打印出`undefined`，但当我们调用fun函数的时候，控制台提示"Uncaught TypeError: undefined is not a function"错误，可见以这种方式创建函数是不会发生函数声明提前的  
