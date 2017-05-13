@@ -685,3 +685,109 @@ console.log(a);
 
 		```  
 		执行`console.log(fun);`时，由于变量声明提前，所以打印出`undefined`，但当我们调用fun函数的时候，控制台提示"Uncaught TypeError: undefined is not a function"错误，可见以这种方式创建函数是不会发生函数声明提前的  
+
+### 14. 创建对象的方法
+- 直接使用`new Object`关键字创建对象
+```
+	var obj = new Object();
+```  
+- 使用工厂方法创建对象  
+```javascript
+	function createObject(name, age, gender){
+		var obj = new Object();
+		obj.name = name;
+		obj.age = age;
+		obj.gender = gender;
+		obj.sayName = function(){
+			alert(this.name);
+		};
+		obj.sayAge = function(){
+			alert(this.age);
+		};
+		obj.sayGender = function(){
+			alert(this.gender);
+		};
+		return obj;
+	}
+	
+	var person = createObject("桔梗", 50, "女");
+	person.sayName();
+	person.sayAge();
+	person.sayGender();
+
+	var person = createObject("犬夜叉", 50, "男");
+	person.sayName();
+	person.sayAge();
+	person.sayGender();
+```  
+- 使用构造函数创建对象
+    - 构造函数也被称为类
+    - 使用构造函数创建的对象也叫做类的实例
+    - 通过instanceof关键字，我们可以看一实例对象所属的类，格式为：`实例 instanceof 类`，若为类的实例返回真，否则返回false       
+```javascript
+	function Person(name, age, gender){
+		this.name = name;
+		this.age = age;
+		this.gender = gender;
+		this.sayName = function(){
+			alert(this.name);
+		};
+	}
+	
+	var person = new Person("swk", 12, "man");
+	person.sayName();
+	console.log(person instanceof Person);//结果是：true
+```
+**为了区别与其他一般的函数，构造函数名的第一个字母应大写**   
+
+### 15. this关键字
+- 当以函数的形式调用的时候，this代表的是window对象  
+- 当以方法的形式调用的时候，this代表的是调用该方法的对象  
+```javascript
+	var name = "全局";
+	
+	function fun(){
+		console.log(this.name);
+	}
+	
+	var obj = {
+		name : "孙悟空",
+		sayName : fun
+	};
+	
+	var obj2 = {
+		name : "沙僧",
+		sayName:fun
+	};
+	
+	fun();//打印出的是'全局'
+	obj.sayName();
+	obj2.sayName();
+	
+	var obj = {
+		name: "孙悟空",
+		age: 13,
+		gender : "男",
+		sayName:function(){
+			alert(this.name);
+		}
+	};
+	obj.sayName();//打印出'孙悟空'
+	obj.sayName();//打印出'沙僧'
+```  
+- 当以构造函数的形式调用的时候，this代表的是新创建的对象  
+```javascript
+	function Person(name, age, gender){
+		this.name = name;
+		this.age = age;
+		this.gender = gender;
+		this.sayName = function(){
+			alert(this.name);
+		};
+	}
+	
+	var person = new Person("swk", 12, "man");
+	person.sayName();
+```  
+
+
