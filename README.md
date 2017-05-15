@@ -790,4 +790,155 @@ console.log(a);
 	person.sayName();
 ```  
 
+### 16. 原型对象  
+- 原型对象也是一个对象
+- 解析器会为我们创建的函数增加一个prototype属性
+- 每一个函数都有一个prototype且各不相同
+- 若函数作为普通的函数调用，prototype没有什么作用
+- 若函数作为构造函数使用，那么通过构造函数创建的每个对象都会有一个__proto__属性，该属性是由解析器添加的，并且也指向了构造函数的prototype对象，如下图所示：  
+![prototype](images/prototype.png)  
+- 由于prototype也是一个对象，那么它也会有一个自己的原型对象，可以通过对象的__proto__属性访问
+- 同一构造函数创建的对象共享构造函数的原型对象，原型对象相当于一个公共的区域，可供对象共同访问，如以下代码： 
+   
+``` javascript
+	function Person(name, age, sex){
+		this.name = name;
+		this.age = age;
+		this.sex = sex;
+	}
+	
+	//在原型对象中添加一个say方法
+	Person.prototype.say = function(){
+		console.log("我是" + this.name);
+	}
+	
+	
+	var person1 = new Person("孙悟空", 12, "男");
+	var person2 = new Person("猪八戒", 13, "男");
+	var person3 = new Person("白骨精", 1, "女");
+	
+	person1.say();	//我是孙悟空		
+	person2.say();  //我是孙悟空			
+	person3.say();	//我是白骨精
+```
+- 当访问一个对象的属性和方法的时候，首先会从对象本身查找相应的属性和方法，若能找到则直接使用（如代码一），若不能则会去其原型对象中查找，若能查找到该属性或者方法，则直接使用，否则去原型对象的原型对象中查找，依次类推，若在原型链中都查找不到所要访问的属性或者方法，程序提示属性或者方法undefined  
+代码一：
+    
+``` javascript 
+	function Person(name, age, sex){
+		this.name = name;
+		this.age = age;
+		this.sex = sex;
+	}
+	
+	//在原型对象中添加一个say方法
+	Person.prototype.say = function(){
+		console.log("我是" + this.name);
+	}
+	
+	//因为对象本身就存在age属性，所以直接访问对象本身的age属性
+	console.log(new Person("孙悟空", 12, "男").age);
+```    
+
+代码二：
+
+```javascript
+	function Person(name, age, sex){
+		this.name = name;
+		this.age = age;
+		this.sex = sex;
+	}
+	
+	//在原型对象中添加一个say方法
+	Person.prototype.say = function(){
+		console.log("我是" + this.name);
+	}
+	
+	var person = new Person("孙悟空", 12, "男");
+	//由于对象本身并没有say方法，而其原型对象有say方法，所以此时会调用原型中的say方法
+	person.say(); //我是孙悟空
+```  
+
+代码三：  
+  
+```javascript
+	function Person(name, age, sex){
+		this.name = name;
+		this.age = age;
+		this.sex = sex;
+	}
+	
+	//在原型对象中添加一个say方法
+	Person.prototype.say = function(){
+		console.log("我是" + this.name);
+	}
+	
+	var person = new Person("孙悟空", 12, "男");
+	//由于对象及其原型链上都不存在a属性，所以打印出undefined
+	console.log(person.a); 
+```  
+- 之前我们知道利用in关键字可以知道某一属性是否属于对象，但是如果对象本身包含某一属性，而其原型对象中存在该属性，那么使用in关键字仍返回true。若要知道对象本身是否存在某一属性，那么我们需要使用hasOwnProperty()方法  
+
+```javascript
+	function Person(name, age, sex){
+		this.name = name;
+		this.age = age;
+		this.sex = sex;
+	}
+	
+	var person = new Person("猪八戒", 2, "男");
+	
+	//在原型对象中添加一个say方法
+	Person.prototype.say = function(){
+		console.log("我是" + this.name);
+	}
+	
+	//虽然对象本身没有say方法，但是在该对象的原型中存在该属性，使用in关键字将返回true
+	console.log('say' in person);  //  true
+	//person对象本身存在age属性，所以返回值为真
+	console.log(person.hasOwnProperty("age"));//true
+	//尽管对象的原型中存在该方法，但是对象本身没有say方法，所以使用hasOwnProperty("say")返回false
+	console.log(person.hasOwnProperty("say"));  //faslse
+```
+
+### 17. 在构造函数函数共享方法问题  
+先来看以下的代码：  
+```
+	function Person(name, age, gender){
+		this.name = name;
+		this.age = age;
+		this.gender = gender;
+		this.sayName = function(){
+			alert(this.name);
+		};
+	}
+	
+	var person = new Person("swk", 12, "man");
+	var person2 = new Person("zbj", 14, "woman");
+	
+	console.log(person.sayName == person2.sayName); //false
+```  
+我们发现使用函数创建对象，每创建一个对象，就创建一个sayName方法，这样显然不太好     
+下面是第一种解决方法，在全局中声明函数，然后将其赋值给对象的方法       
+```
+	function Person(name, age, gender){
+		this.name = name;
+		this.age = age;
+		this.gender = gender;
+		this.sayName = say;
+	}
+	
+	function say(){
+			alert(this.name);
+	};
+	
+	var person = new Person("swk", 12, "man");
+	var person2 = new Person("zbj", 14, "woman");
+	
+	console.log(person.sayName == person2.sayName); //true
+```  
+上面的结果打印的是true，可见使用同一构造函数创建的对象确实共享了同一函数，但是这样做却是有一个弊端，也就是命名空间污染问题----因为我们是在全局中定义了对象的函数，假设我们的项目是多人开发，那么他人就可能定义与你在全局中定义的对象方法相同的函数，此时你的方法可能被覆盖，所以使用这种方法也是不安全的   
+下面我们来看第三种解决方案：将对象的公共属性或者方法设置在原型对象中        
+
+
 
