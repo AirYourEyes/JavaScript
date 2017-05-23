@@ -821,7 +821,7 @@ console.log(a);
 	person2.say();  //我是孙悟空			
 	person3.say();	//我是白骨精
 ```
-- 当访问一个对象的属性和方法的时候，首先会从对象本身查找相应的属性和方法，若能找到则直接使用（如代码一），若不能则会去其原型对象中查找，若能查找到该属性或者方法，则直接使用，否则去原型对象的原型对象中查找，依次类推，若在原型链中都查找不到所要访问的属性或者方法，程序提示属性或者方法undefined  
+- 当访问一个对象的属性和方法的时候，首先会从对象本身查找相应的属性和方法，若能找到则直接使用（如代码一），若不能则会去其原型对象中查找，若能查找到该属性或者方法，则直接使用，否则去原型对象的原型对象中查找，依次类推，直到找到Object对象，若该对象也查找不到所要访问的属性或者方法，程序提示属性或者方法undefined  
 代码一：
     
 ``` javascript 
@@ -899,7 +899,8 @@ console.log(a);
 	console.log(person.hasOwnProperty("age"));//true
 	//尽管对象的原型中存在该方法，但是对象本身没有say方法，所以使用hasOwnProperty("say")返回false
 	console.log(person.hasOwnProperty("say"));  //faslse
-```
+```  
+- 除了Object对象之外，其他的都有一个__proto__属性，指向其原型对象  
 
 ### 17. 在构造函数函数共享方法问题  
 先来看以下的代码：  
@@ -938,7 +939,533 @@ console.log(a);
 	console.log(person.sayName == person2.sayName); //true
 ```  
 上面的结果打印的是true，可见使用同一构造函数创建的对象确实共享了同一函数，但是这样做却是有一个弊端，也就是命名空间污染问题----因为我们是在全局中定义了对象的函数，假设我们的项目是多人开发，那么他人就可能定义与你在全局中定义的对象方法相同的函数，此时你的方法可能被覆盖，所以使用这种方法也是不安全的   
-下面我们来看第三种解决方案：将对象的公共属性或者方法设置在原型对象中        
+下面我们来看第三种解决方案：将对象的公共属性或者方法设置在原型对象中 
+  
+```javascript
+	function Person(name, age, sex){
+		this.name = name;
+		this.age = age;
+		this.sex = sex;
+	}
+	
+	Person.prototype.say = function(){
+		console.log(this.name);
+	}
+	
+	var person = new Person("猪八戒", 2, "男");
+	var person2 = new Person("孙悟空", 3, "男");
+	
+	person.say();
+	person2.say();
+	
+```         
+
+###  18. 数组
+- 简介：
+    - 数组也是一个对象
+    - 数组中的元素通过索引进行访问 
+    - 数组的索引从0开始
+- 创建数组：
+    - 方式一：使用new关键字 
+		- `var arrName = new Array();`
+	    - arrName指的是数组名
+	    - Array是创建数组的关键字
+	    - 如： `var arr = new Array();`
+	- 方式二：使用中括号
+	    - `var arr = []`
+	    - 上面的方式创建了一个空数组
+	- 方式三：创建并初始化数组
+	    - `var arr = [1, 2, 3, 4, 5]`
+	    - 上面的代码创建了一个长度为5的数组，从索引号0开始赋值
+	- 注意：我们也可以使用new关键字来创建数组并给数组初始化，但是不推荐使用，原因如下所示：
+	    - `var arr = new Array(1, 2, 3, 4, 5);`效果与上面的方式三是相同的
+	    - 但是下面的代码：`var arr = new Array(10);`却不是创建一个长度为1，初始值为10的数组，这里的10作为参数初始化了length的值
+	    - 基于上面两点，使用这种方式创建和初始化数组的方法不是很好的，若要创建和初始化一个数组，推荐使用第三种方式
+- 使用数组：
+    - 通过从0开始的索引可以访问数组的元素
+    - 给数组元素赋值： `arrName[index] = value`
+        - arrName代表的是数组名
+        - index代表的是索引值，从0开始
+        - value表示的给该元素所赋的值
+        - 如：`arr[0] = 12;`表示的是给索引为0的元素赋值12
+        - 数组元素的值可以是任意的类型，如数组元素的值可以是数组，通过这种方式我们可以创建多维数组，如以下代码创建了一个二维数组：  
+        ```javascript
+			var a = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+			console.log(a[0]); //1, 2, 3
+			console.log(a[1]); //4, 5, 6
+			console.log(a[2]); //7, 8, 9
+		```
+    - 读取数组元素：`arrName[index]`
+        - arrName代表的是数组名
+        - index代表的是索引值，从0开始
+        - 如`console.log(arr[0]);`表示的是打印索引为0的元素的值
+        - 注意：若未给索引为index的元素赋值，那么访问该元素的时候会提示undefined，如`console.log(arr[1]);`，如果我们在之前并没有给索引为1的元素赋值，那么此时程序打印出undefined
+    - 获取数组的长度：数组对象中有一个length属性，可以获取或者设置数组的长度
+        - 注意：length的值默认是数组最大索引值加一，而不管数组是否是连续的，在代码一种我们会发现虽然索引没有从0开始，但是打印出的元素的个数为4，因为其最大的索引为3；在代码二中，我们发现，虽然数组不是连续的，但是length为101，这是因为该数组的最大索引值为100，我们还发现最后访问未被赋值的元素，该元素仍是undefined    
+        代码一：  
+        ```javascript
+			var arr = new Array();
+			arr[1] = 12;
+			arr[2] = 13;
+			arr[3] = 14;
+			console.log(arr.length); //4
+		```  
+		代码二：  
+		```javascript
+			var arr = new Array();
+			arr[1] = 12;
+			arr[2] = 13;
+			arr[3] = 14;
+			arr[100] = 100;
+			console.log(arr.length);  //101
+			console.log(arr[6]);	//undefined
+		```  
+		- 当设置length的值小于数组元素的数量的时候，多出的数组元素将被舍弃  
+		```javascript
+			var a = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+			//设置length的值为3
+			a.length = 3;
+			//多余的元素将被舍弃掉
+			console.log(a); // 1,2,3
+		```  
+		- 当设置length的值大于数组元素的时候，除数组原有的元素之外，多出的元素全部为undefined  
+		```javascript
+			var a = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+			//设置length的值为15，大于元素组的长度
+			a.length = 15;
+			//除数组原有的元素之外，多出的元素全部为undefined
+			console.log(a); // 1,2,3,4,5,6,7,8,9,,,,,,
+		```
+	- 数组中常用的方法：
+		- push方法：在数组末端添加一个或者多个元素，返回此时的length值  
+		```javascript
+			var a = [4, 5, 6];
+			var len = a.push(7, 8, 9);
+			//打印出此时数组的内容
+			console.log(a);//4, 5, 6, 7, 8, 9
+			//打印出数组的长度
+			console.log(len);//6  
+		```
+		- pop方法：删除并且返回数组最后一个元素的值  
+		```javascript
+			var a = [1, 2, 3, 4, 5, 6];
+			var lastOne = a.pop();
+			//打印出此时数组的内容
+			console.log(a);//1,2,3,4,5
+			//打印弹出的元素的值
+			console.log(lastOne);  
+		```
+		- unshift方法：在数组首部添加一个或者多个元素，返回此时的length值    
+		```javascript
+			var a = [4, 5, 6];
+			var len = a.unshift(1, 2, 3);
+			//打印此时数组中的内容
+			console.log(a);//1,2,3,4,5,6
+			//打印出此时数组的长度
+			console.log(len);//6
+		```  
+		- shift方法：删除并返回数组首部第一个元素的值  
+		```javascript
+			var a = [1, 2, 3, 4, 5];
+			var firstOne = a.shift();
+			//打印此时数组中的内容
+			console.log(a);//2,3,4,5
+			//打印弹出的元素的值
+			console.log(firstOne);//1
+		```  
+		- slice（start， end）方法：返回索引号从start到end（不包含end）的数组，不影响原数组，若省略end，将返回从索引号start开始到数组末尾的所有元素  
+		```javascript
+			var a = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+			//返回索引号0到3（不包括3）的元素组成的数组
+			var b = a.slice(0, 3);
+			//不影响原数组
+			console.log(a);//1,2,3,4,5,6,7,8,9
+			//输出获取到的数组
+			console.log(b);//1,2,3
+			//若不指定end值，将获取从start到数组结尾的所有元素
+			var c = a.slice(6);
+			//输出获取到的数组
+			console.log(c);//7,8,9
+		```
+			- **注意：**end值也可以是负数，-1代表的是倒数最后第二个元素，-2代表的是倒数第三个元素，依此类推
+			```javascript
+				var a = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+				var d = a.slice(1, -1);
+				console.log(d);//2,3,4,5,6,7,8
+			```
+		- splice方法：删除元素并向数组中添加新的元素，并返回被删除的元素组成的数组，**要注意的是该方法会对原先的数组产生影响**
+			- 第一个参数表示的是要删除元素的开始索引
+			- 第二个参数表示的是删除元素的个数
+			- 第三个参数及其以后的参数表示的新添的元素，该参数可以不指定
+			```javascript
+				var a = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+				//删除并返回从0开始的两个元素组成的数组，此时不添加新的元素
+				var b = a.splice(0, 2);
+				//打印删除元素的数组
+				console.log(b);
+				//打印删除了元素之后的数组，会发现原数组发生了变化
+				console.log(a);//3,4,5,6,7,8,9
+				//删除数组中最后两个元素并增添三个元素
+				a.splice(5, 2, 100, 1000);
+				//打印此时数组中的内容
+				console.log(a);//3,4,5,6,7,100,1000
+			```  
+			- **删除指定元素后，余下的数组元素的索引号会发生调整，也就是说如果我们删除了第一个元素，那么第二个元素的索引就会变成0，后面的元素也会发生相应的调整**
+		- concat方法：用于连接两个或者多个数组，并且返回一个连接好的数组，不对原先的数组产生影响
+			- 连接两个数组，如下代码：
+			```javascript
+				var arr1 = [1, 2, 3, 4];
+				var arr2 = [5, 6, 7, 8];
+				var arr3 = [9, 10, 11, 12];
+				var res = arr1.concat(arr2, arr3);
+				console.log(arr1);//1, 2, 3, 4
+				console.log(arr2);//5, 6, 7, 8
+				console.log(arr3);//9, 10, 11, 12
+				console.log(res);//1, 2, 3,4 ,5, 6, 7, 8, 9, 10, 11, 12
+			```
+			- 参数中也可以是元素，如以下的代码：
+			```javascript
+				var arr1 = [1, 2, 3, 4];
+				var res = arr1.concat(5, 6, 7, 8);
+				console.log(arr1);//1, 2, 3, 4
+				console.log(res);//1, 2, 3,4 ,5, 6, 7, 8
+			```
+		- join方法：用指定的分隔符将数组转化成字符串（若不指定，默认使用逗号作为分隔符),不对原数组产生影响
+			- 实例：
+			```javascript
+				var arr = ["Alice", "Bob", "Clarence"];
+				var res1 = arr.join();
+				console.log(typeof arr);//object
+				console.log(typeof res1);//string
+				console.log(res1);//默认以逗号作为分隔符，输出"Alice,Bob,Clarence"
+				var res2 = arr.join("####");//指定分隔符
+				console.log(res2);//Alice####Bob####Clarence			
+			```
+		- reverse方法：反转数组，该方法会改变原数组
+			-实例: 
+			```javascript
+				var arr = [1, 2, 3, 4, 5];
+				arr.reverse();
+				console.log(arr);//5,4,3,2,1
+			```
+		- sort方法：对数组进行排序，会修改原数组
+			- sort方法默认使用Unicode编码比较大小，即使比较的元素为纯数字
+			```javascript
+				var arr = [1, 3, 2, 11, 9, 8];
+				arr.sort();//sort方法默认使用Unicode编码进行比较，即使比较的元素为纯数字
+				console.log(arr);//1,11,2,3,8,9
+			```
+			- 可以使用将自定义函数传给sort方法，使得sort方法按照我们自定义的函数进行比较大小
+				- 我们将自定义函数称为回调函数
+				- 该回调函数有两个参数，sort方法每次调用该函数的时候，会将比较的两个数分别传给这两个参数，然后进行比较，如`arr.sort(function (a, b){return a - b;});`，其中使用function定义的函数就是我们自定义的回调函数了
+				- sort方法每次比较大小的时候，都会调用该方法，若该方法返回值大于0，则交换这两个进行比较的元素，否则不该表其位置
+				- 实例：
+				```javascript
+					var arr = [1, 3, 2, 11, 9, 8];
+					arr.sort(function (a, b){return a - b;});//使用自定义函数（回调函数）比较元素之间的大小
+					console.log(arr);//1,2,3,8,9,11
+				```
+	- 遍历数组
+		- 方法一：使用for循环  
+		```javascript
+			var a = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+			for (var i = 0; i < a.length; i++){
+				console.log(a[i]);
+			}
+		```  
+		- 方法二：使用forEach函数
+			- 第一个参数表示的是当前元素的值
+			- 第二个参数表示的当前元素的索引号
+			- 第三个元素表示的
+			- 第四个参数表示的被遍历的数组
 
 
+### 19.函数对象的call，apply方法
+- 调用无参函数的方法
+	- 方法一：函数名()；
+	- 方法二：函数名.call();
+	- 方法三：函数名.apply();
+	- 如以下的代码：
+	```javascript
+		function fun(){
+			alert("hello");
+		}
+		
+		//方法一：函数名（）
+		fun();
+		//方法二：函数名.call();
+		fun.call();
+		//方法三：函数名.apply();
+		fun.apply();
+	```
+- 使用call与apply调用函数与普通调用方法的区别
+	- 使用普通方法调用函数，在函数内部的this关键字代表的是window对象
+	- 使用call，apply方法调用函数，this代表的是传给call，apply方法的对象
+	- 实例：
+	```javascript
+		var name = '123';
+		
+		function fun(){
+			console.log(this.name);
+		}
+		
+		var obj1 = {name: '456'};
+		var obj2 = {name: '789'};
+		
+		//方法一
+		fun(); //123
+		//方法二：
+		fun.call(obj1);//456
+		//方法三：
+		fun.apply(obj2);//789
+	```
+- 调用有参函数的方法
+	- 方法一： 函数名(参数列表);
+	- 方法二： 函数名.call(对象名, 参数列表);
+	- 方法三： 函数名.apply(对象名, 封装参数的数组);
+	- 实例： 
+	```javascript
+		var name = 'I am window object!!';
+	
+		function fun(a, b){
+			console.log(this.name);
+			console.log("a + b = " + (a + b));
+		}
+		
+		var obj1 = {name: "I am obj1!!"};
+		var obj2 = {name: "I am obj2!!"};
+		
+		//方法一
+		fun(1, 2); //I am window object!!  a + b = 3
+		//方法二：
+		fun.call(obj1, 3, 4);//I am obj1!! a + b = 7
+		//方法三：
+		fun.apply(obj2, [5, 6]);//I am obj1!! a + b = 11
+	```
+- call方法与apply方法的区别：其实从上一个知识点我们就可以看出两者的区别了，调用call方法时，若要传参数，直接使用参数列表，而对于apply方法，则需将参数全部封装到数组中再传递，否则会报错
+- this关键字小结：
+	- 调用函数时，this指向window对象（不使用call，apply方法调用函数）
+	- 调用方法时，this指向调用它的对象（不使用call，apply方法调用函数）
+	- 以构造方法调用时，this指向新创建的对象
+	- 使用call，apply调用时，this执行第一个参数所指向的那个对象
 
+### 20. arguements对象
+- 浏览器调用函数的时候会自动传递进来两个对象，一个为this，一个为arguements对象
+```javascript
+	function fun(){
+		console.log(arguments);
+	}
+	
+	fun();//object Arguments
+```
+- arguments对象是一个类数组的对象（但是不是数组），用来保存传给函数的实参值，并且跟函数是否定义形参没有任何关系，我们可以给无形参函数传递实参，在函数内部通过索引方式进行调用，如下代码很好的说明了这一点
+```javascript
+	function fun(){
+		console.log(arguments[0]);
+		console.log(arguments[1]);
+	}
+	
+	fun("hello", true);//hello true
+```
+
+### 21. Date对象
+- 用于处理日期和时间
+- 创建Date对象	
+	- `var date = new Date();`该语句将将执行该代码的时间作为初始值创建Date对象
+	- `var date = new Date('mm/dd/yyyy hh:MM:ss')`，mm代表月份，dd代表日，yyyy代表年，hh代表小时，MM代表分钟，ss代表秒
+	- 其他的创建方式看一下链接：[js data日期初始化的5种方法](http://www.jb51.net/article/44981.htm)
+- 常用的方法：
+	- getDate(): 从 Date 对象返回一个月中的某一天 (1 ~ 31)
+	- getDay(): 从 Date 对象返回一周中的某一天 (0 ~ 6)
+	- getMonth(): 从 Date 对象返回月份 (0 ~ 11)
+	- getFullYear(): 从 Date 对象以四位数字返回年份  
+	- 其他的方法可以看w3school里的手册:[javascript-Date](http://www.w3school.com.cn/jsref/prop_node_nodevalue.asp)
+
+### 22. Math对象
+- 常见的数学操作
+- 常见的方法：
+	- floor(x): 对数进行下舍入
+	- ceil(x): 对数进行上舍入
+	- round(x): 把数四舍五入为最接近的整数
+	- random(): 返回 0 ~ 1 之间的随机数  
+	- 其他的方法看w3school里的手册：[javascript-Math](http://www.w3school.com.cn/jsref/jsref_obj_math.asp)  
+ 
+### 21. 包装对象
+- 将基本类型封装成对象，使其能用到对象中的方法
+- 使用Number可以将基本数据类型number包装成对象
+- 使用String可以将基本数据类型string包装成对象
+- 使用Boolean可以将基本数据类型boolean包装成对象
+```javascript
+	var bool = new Boolean(true);
+	var num = new Number(12);
+	var str = new String("hela");
+```
+- 实际上我们自己很少用到这种包装类，因为很容易产生误解，如以下代码，就很容易产生误解，不管构造函数中的参数为true或者false，下面的if语句都会执行。其原因是bool是一个对象，转化成boolean值为真，若if语句都会执行
+```javascript
+	var bool = new Boolean(false);
+	if (bool){
+		alert("我执行了");
+	}
+```
+- 在实际开发中，我们很少直接调用它，当我们使用基本数据类型调用方法时，实际上是先将基本数据类型封装到相应的类中，然后再调用对象方法，如以下的代码：
+```javascript
+	var  str = "123";
+	//先将str包装到String对象中，然后调用String对象中的length方法
+	console.log(str.length);
+```
+
+### 22. String对象
+- 用于处理文本
+- 创建方法：
+	- ` new String(s);`，返回一个新创建的String对象
+	- `String(s)`，该方法返回的值的类型为string类型，而不是对象类型，且没有改动s本身
+	```javascript
+		var num = 12;
+		var str = String(num);
+		console.log(typeof num);//number
+		console.log(typeof str);//string
+	```
+-  String对象地底层是一个字符数组，我们可以通过索引来访问对象中的元素
+```javascript
+
+	var str = new String("1234567890");
+	console.log(str[0]);//'1'
+	console.log(str[1]);//'2'
+	console.log(str[2]);//'3'
+```
+- 方法：
+	- charAt(): 返回在指定位置的字符，如：
+	```javascript
+		var str = new String("1234567890");
+		console.log(str.charAt(0));//'1'，作用与str[0]相同
+		console.log(str.charAt(1));//'2'，作用与str[1]相同
+		console.log(str.charAt(2));//'3'，作用与str[2]相同
+	``` 
+	- charCodeAt(): 返回在指定的位置的字符的Unicode编码
+	- concat(): 连接字符串 
+	- indexOf(): 检索字符串，若找到匹配的字符，返回第一个字符的在字符串中的索引值，否则返回-1
+	```javascript
+		var str = new String("1234567890");
+		console.log(str.indexOf('1'));//0
+		console.log(str.indexOf('23'));//1
+		console.log(str.indexOf('145'));//-1
+	``` 
+	- lastIndexOf(): 与indexOf方法类似，但是是从后向前搜索字符串
+	- match()： 找到一个或多个正则表达式的匹配，讲正则表达式的时候详细介绍
+	- replace()： 替换与正则表达式匹配的子串，讲正则表达式的时候详细介绍 
+	- search()： 检索与正则表达式相匹配的值，讲正则表达式的时候详细介绍
+	- slice()： 提取字符串的片断，并在新的字符串中返回被提取的部分，索引值可以为负数，第一个参数表示的是开始截取的索引号（包含该索引号），第二个表示的是结束索引号（不包含该索引号）
+	```javascript
+		var str = new String("1234567890");
+		var res = str.slice(0, -1);
+		console.log(res);//'123456789'
+	```
+	- split(): 用指定的分隔符将字符串分割为字符串数组
+	- substring()： 提取字符串中两个指定的索引号之间的字符，作用slice相同，但是该方法不支持负值索引，若使用负值，方法会将该索引值当做0处理；若第一个参数的值大于第二个参数的值，两者会交换，然后再截取字符串
+	```javascript
+		var str = new String("1234567890");
+		var res = str.substring(0, -1);//索引值-1被当做0处理
+		console.log(res);//输出为空字符串
+		var res2 = str.substring(5, 0);//第一个参数的值大于第二个参数的值，交换两者的位置，所以相当于str.substrig(0, 5);
+		console.log(res2);//'12345'
+	```  
+	- toLowerCase()： 把字符串转换为小写
+	- toUpperCase()： 把字符串转换为大写  
+	- toString()： 返回字符串  
+	- valueOf()： 返回某个字符串对象的原始值 
+
+### 23. 正则表达式
+- 用来匹配字符串
+- 创建正则表达式对象
+	- `new RegExp(pattern, attributes)`
+	- pattern是一个字符串，指定了正则表达式的模式或其他的正则表达式
+	- attributes 是一个可选的字符串，包含属性 "g"、"i" 和 "m"。如果 pattern 是正则表达式，而不是字符串，则必须省略该参数
+		- g：表示全局模式
+		- i:表示的忽略大小写
+		- m：代表的是多行匹配
+- 使用正则表达式
+	- 可以使用正则表达式对象的test方法来测试某一字符串中是否包含指定的模式，若包含则返回true，否则返回false
+	```javascript
+		var str = new String("abcdefghijk");
+		var re = new RegExp('A');
+		var isContain = re.test(str);//false
+		console.log(isContain);
+		re = new RegExp('a');
+		isContain = re.test(str);
+		console.log(isContain);//true
+	```
+
+
+### 24. DOM
+- 简介
+	- 全称Document Object Model，文档对象模型
+	- js中通过DOM来对HTML文档进行操作
+	- 文档：表示的就是整个HTML网页文档
+	- 对象：表示的是将网页的每一个部分都转换为一个对象
+	- 模型：使用模型来表示对象之间的关系，这样便于获取对象
+- HTML DOM树  
+![html-dom](http://www.w3school.com.cn/i/ct_htmltree.gif)   
+- 节点
+	- 概述：
+		- Node
+		- 构成HTML文档的基本单位
+		- 整个网页的每一部分都可以称之为结点
+		- 标签，属性，文本，注释，整个网页都可以看做节点
+	- 节点的分类：
+		- 文档节点
+			- 整个HTML文档
+			- 网页上其他的节点都是它的子节点
+			- document对象作为window对象的属性存在，不用获取即可使用
+			- 通过该对象我们可在整个文档中访问查找其他的节点对象，并可以通过该对象创建各种节点对象
+		- 元素节点
+			- HTML中的每一个元素（也叫做标签）都是节点
+		- 属性节点
+			- 标签中的属性
+			- 属性节点并非元素节点的子节点，而是元素节点的一部分
+			- 可以通过元素节点的getAttributeNode("属性名")获取属性节点
+			- 我们一般不使用元素节点
+		- 文本结点
+			- 标签中的文本
+			- 文本节点一般是作为元素节点的子节点存在的
+			- 获取文本节点时，一般先要获取元素节点，再通过元素节点获取文本节点
+	- 节点的类型不同，属性和方法也不尽相同
+	- 节点的属性
+	|节点类型       |nodeName     |nodeType     |nodeValue   |
+	|:------------:|:-----------:|:-----------:|:----------:|	
+	|文档节点       |#document    |9            |null        |
+	|元素节点       |元素名        |1            |null        |
+	|属性节点       |属性名        |2            |属性值       |
+	|文本结点       |#text        |3            |文本内容     |
+	- 获取节点
+		- 使用document对象获取元素节点
+			- 通过document对象调用getElementById(),该方法通过id属性获取**一个**元素节点对象
+			- 通过document对象调用getElementsByTagName（），该方法通过标签名获取**一组**元素节点对象
+			- 通过document对象调用getElementsByName（），该方法通过name属性获取**一组**元素节点对象
+		- 获取元素的节点的子节点
+			- 通过具体元素的属性或者方法来获取子节点
+				- 通过getElementsByTagName()，该方法返回当前节点的指定标签名后代节点
+				- 通过childNodes属性，该属性返回当前节点的**所有子节点**
+				- 通过firstChild属性，该属性返回当前节点的**第一个子节点**
+				- 通过firstElementChild属性，该属性将返回当前节点的**第一个子元素**，该属性不兼容IE8及其以下的浏览器
+				- 通过lastChild属性，该属性返回当前节点的**最后一个子节点**
+				- 通过lastElementChild属性，该属性返回的是当前节点的**最后一个子元素**，该属性不兼容IE8及其以下的浏览器 
+				- 通过children属性，该属性返回当前节点的**所有子元素**
+			- 注意：使用childNodes，firstChild属性，lastChild属性千万要注意，因 为他们可能获取文本节点，特别要注意的是浏览器一般会将标签之间的空白当做文本节点处理，如对于如下标签结构，我们通过childNodes属性获取的节点共有九个  
+			![childNodes](images/childNodes.png)    
+			若我们使用的是children属性，firstElementChild属性，lastElementChild属性，或者getElementByTagName方法则不会将文本节点算在内 
+		- 获取父节点和兄弟节点
+			- 通过具体的节点调用
+				- parentNode属性，表示当前节点的父节点
+				- previousSibling属性，表示当前节点的**前一个兄弟节点**
+				- previousElementSibling属性，表示当前节点的**前一个兄弟元素**，该属性不兼容IE8及其以下的浏览器
+				- nextSibling属性，表示当前节点的**后一个兄弟节点**
+				- nextElementSibling属性，表示的是当前节点的**后一个兄弟元素**，该属性不兼容IE8及其以下的浏览器    
+			- 注意事项与前一个知识点相同        
+
+- 事件
+	- 简介
+		- 指的是文档或浏览器窗口中发生的一些特定的交互瞬间
+		- JavaScript与HTML之间的交互是通过事件实现的
+		- 对于web应用来说，有下面这些代表性的事件：点击某个元素，将鼠标移动到某个元素的上方，按下键盘上的某个键等
+	- 事件的响应步骤
+		- 
