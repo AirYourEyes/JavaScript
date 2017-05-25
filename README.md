@@ -231,10 +231,16 @@ js中共有六种数据类型，其中前五种是基本数据类型，最后一
     - 仅当两边的值均为true时，结果为true
     - 若有非boolean类型数据参与运算，则先将非boolean类型转换成boolean类型，然后再进行运算
     - 该与运算是短路与，即当第一个条件为假的时候不检查第二个条件，如`false && alert("I am here");`不打印任何信息
+    - 特殊：
+    	- 只要“&&”前面是false，无论“&&”后面是true还是false，结果都将返“&&”前面的值
+    	- 只要“&&”前面是true，无论“&&”后面是true还是false，结果都将返“&&”后面的值 
 - 或（||）
     - 仅当两边的条件均为false的时候结果false
     - 若有非boolean类型数据参与运算，则先将非boolean类型转换成boolean类型，然后再进行运算 
     - 该或运算是短路或，即当第一个条件为真的时候不检查第二个条件，如`true || alert("I am here");`不打印任何信息
+    - 特殊：
+    	- 只要“||”前面为false,不管“||”后面是true还是false，都返回“||”后面的值
+    	- 只要“||”前面为true,不管“||”后面是true还是false，都返回“||”前面的值
 - 非（！）
     - true的非为false，false的非为true
     - 对一个非boolean类型的变量取两次非可以将其转化成boolean类型，如`var a = 12; a = !!a; console.log(typeof a); console.log(a);`显示的结果是`boolean true`
@@ -1403,6 +1409,9 @@ console.log(a);
 	- 文档：表示的就是整个HTML网页文档
 	- 对象：表示的是将网页的每一个部分都转换为一个对象
 	- 模型：使用模型来表示对象之间的关系，这样便于获取对象
+- 编写JavaScript的位置
+	- 在head标签中的scripts标签中使用window.load，编写的代码放在该函数中，可以保证整个HTML文档加载完之后再执行js代码
+	- 编写在文档的最后面，也是保证整个HTML文档被全部加载完之后再执行js代码 
 - HTML DOM树  
 ![html-dom](http://www.w3school.com.cn/i/ct_htmltree.gif)   
 - 节点
@@ -1460,7 +1469,18 @@ console.log(a);
 				- previousElementSibling属性，表示当前节点的**前一个兄弟元素**，该属性不兼容IE8及其以下的浏览器
 				- nextSibling属性，表示当前节点的**后一个兄弟节点**
 				- nextElementSibling属性，表示的是当前节点的**后一个兄弟元素**，该属性不兼容IE8及其以下的浏览器    
-			- 注意事项与前一个知识点相同        
+			- 注意事项与前一个知识点相同   
+		- 其他的方法
+			- document.all表示的所有的**元素**，注意不包含文本节点
+			- document.body表示的是body标签
+			- document.querySelector(selectorString)选择选择器为selectorString的第一个标签
+				- selectorString是css中的选择器
+			- document.querySelectorAll(selectorString);选择选择器为selectorString的所有标签 
+	- 创建节点
+		- 创建元素节点：document.createElement(newNodeName)
+		- 设置节点的内容：newNode.innerHTML = content
+			- innerHTML,innerText都跟节点的内容有关，但是innerHTML包括节点中的标签(如果有的话)，而innerText只包含文本内容，如`若ul.innerHTML的内容是'<li>爱我中华</li>'，则ul.innerText的内容就是'爱我中华'`
+	- 删除节点：parentNode.removeChild(oldNode)：通过父节点parentNode删除指定节点，parentNode可以通过子节点的parentNode属性获取
 
 - 事件
 	- 简介
@@ -1468,4 +1488,8 @@ console.log(a);
 		- JavaScript与HTML之间的交互是通过事件实现的
 		- 对于web应用来说，有下面这些代表性的事件：点击某个元素，将鼠标移动到某个元素的上方，按下键盘上的某个键等
 	- 事件的响应步骤
-		- 
+	- 事件对象
+		- 当事件的响应函数触发时，浏览器每次都会将一个事件对象作为参数传给响应函数，我们可以通过定义形参的方式获取该事件对象。在事件对象中封装了当前事件相关的一切信息，比如，鼠标的坐标，键盘哪个键被按下等。。。。具体可以看以下的链接[JavaScript 事件参考手册](http://www.w3school.com.cn/jsref/jsref_events.asp)
+	- 事件冒泡
+		- 所谓的事件冒泡指的是事件的向上传导，当后代元素上的事件被触发的时候，其**祖先元素相同的事件**也会被触发
+		- 取消事件冒泡：`event.cancelBubble = true`，event指的是事件对象
