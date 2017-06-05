@@ -1,3 +1,4 @@
+<!--点击“添加项目”按钮，可以增加一个“项目”， 点击“项目”会响应“hello”-->
 <!DOCTYPE html>
 <html>
 	<head>
@@ -10,6 +11,7 @@
 				ul.onclick = function(event){
 					//兼容IE与其他浏览器
 					event = event||window.event;
+					//只对class属性为link的元素起作用
 					if (event.target.className == "link"){
 						alert("hello");	
 					}
