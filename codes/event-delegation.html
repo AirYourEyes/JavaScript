@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript">
+			window.onload = function(){
+				var button = document.getElementsByTagName("button")[0];
+				var ul = document.getElementsByTagName("ul")[0];
+				ul.onclick = function(event){
+					//兼容IE与其他浏览器
+					event = event||window.event;
+					if (event.target.className == "link"){
+						alert("hello");	
+					}
+				};
+				button.onclick = function(){
+					var li = document.createElement("li");
+					li.innerHTML = "<a href='javascript:;' class='link'>新建项目</a>";
+					ul.appendChild(li);
+				};
+			};
+		</script>
+	</head>
+	<body>
+		<button>添加项目</button>
+		<ul>
+			<li><a href="javascript:;" class="link">项目一</a></li>
+			<li><a href="javascript:;" class="link">项目二</a></li>
+			<li><a href="javascript:;" class="link">项目三</a></li>
+		</ul>
+		
+	</body>
+</html>

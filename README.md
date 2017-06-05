@@ -1493,3 +1493,34 @@ console.log(a);
 	- 事件冒泡
 		- 所谓的事件冒泡指的是事件的向上传导，当后代元素上的事件被触发的时候，其**祖先元素相同的事件**也会被触发
 		- 取消事件冒泡：`event.cancelBubble = true`，event指的是事件对象
+	- 事件委派
+		- 利用事件冒泡，将事件绑定在父元素上，可以减少重复在子元素上添加相同的事件
+		- [点击查看例子](codes/event-delegation.html)
+- 修改样式
+	- 语法：元素.style.样式属性 = 属性值；
+	- 注意：想background-color这样的带有横杠的属性名，必须先去掉横杠，然后使用驼峰式的命名方法，如将background-color改为了backgroundColor，如`box.style.backgoundColor`
+	- 通过style属性修改样式实际上是修改元素的内联样式，所以具有很高的优先级
+	- 通过style只能读取内联样式，而不能读取样式表中的内容，如`box.style.width`
+- 获取当前样式
+	- **对于IE（其他的浏览器不可以）**，可以使用currentStyle属性获取当前起作用的样式的值，如`box.currentStyle.width`用来获取box代表的元素的当前的样式。若没有设置样式表，则获取的值为浏览器默认样式表中的默认值，如width默认值为auto，注意是auto，不是具体的长度
+	- **对于IE之外的浏览器**，可以使用getComputedStyle函数，第一个参数是代表的元素对象，第二个参数一般来说为null，如`getComputedStyle(box, null).width` 用来获取box代表的元素当前的width值，通过该方法获取的是具体的值，而不是向auto之类的默认值
+	- 兼容IE和其他浏览器：`window.getComputedStyle(ele, null)[name] || ele.currentStyle[name]` 
+- 元素的可见高度与宽度
+	- `element.clientHeight`表示的是元素的可见高度，`element.clientWidth`表示的是元素的可见宽度
+		- 其值都是数字类型，不包含单位px
+		- 可见宽度和高度包括内容区与内边距，如假如内容区的宽度是100px，而内边距为10px，边框是20px，则可见宽度是120px，而不是160px
+		- 这两个属性都是只读的
+	- `element.offsetHeight`表示的是整个元素的高度，`element.offsetWidth`表示的是整个元素的宽度
+		- 元素的高度和宽度都包括元素的内容区，内边距和外边框
+		- 只读
+- 获取最近的开启了定位的祖先元素
+	- 使用`element.offsetParent`
+	- 若所有的祖先元素都没有开启定位，则该值表示的是body元素  
+- 获取带滚动条的元素的高度与宽度
+	- `element.scrollHeight`	返回元素的整体高度 
+	- `element.scrollWidth`返回元素的整体高度
+	- `element.scrollLeft`返回滚动条向右滚动的长度
+	- `element.scrollTop`返回滚动条向下滚动的长度
+- 如何判读滚动条滚动到底
+	- 判断滚动条滚动到了最下面：`element.scollHeight-element.scollTop==element.clientHeight`
+	- 判断滚动条滚动到了最右边：`element.scollWidth-element.scollLeft==element.clientWidth` 
